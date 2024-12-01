@@ -4,8 +4,25 @@
 const int WINDOW_SCREEN_WIDTH = 640;
 const int WINDOW_SCREEN_HEIGHT = 480;
 
+int movementSpeed = 10;//player speed
+int playerWidth = 40;
+int playerHight = 200;
+
+
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+
+SDL_Rect player1 = { 20, (WINDOW_SCREEN_HEIGHT - playerHight) / 2, playerWidth, playerHight };
+SDL_Rect player2 = { WINDOW_SCREEN_WIDTH - 60, (WINDOW_SCREEN_HEIGHT - playerHight) / 2, playerWidth, playerHight };
+SDL_Rect ball = { (WINDOW_SCREEN_WIDTH - 20) / 2,(WINDOW_SCREEN_HEIGHT - 20) / 2,20,20 };
+
+typedef struct speed
+{
+    int x;
+    int y;
+}Speed;
+
+Speed ballSpeed = { 10,0 };//init ball speed
 
 int Initisialize()
 {
@@ -36,17 +53,35 @@ void ClearScreen()
     SDL_RenderClear(renderer);
 }
 
-void UpdateScreen(SDL_Rect player1, SDL_Rect player2)
+void UpdateScreen()
 {
     ClearScreen();
     SDL_SetRenderDrawColor(renderer, 225, 255, 255, 255);
     SDL_RenderFillRect(renderer, &player1);
     SDL_RenderFillRect(renderer, &player2);
+    SDL_RenderFillRect(renderer, &ball);
     SDL_RenderPresent(renderer);
 }
 void MovePlayer(SDL_Rect* rect, int speed)
 {
     rect->y += speed; 
+}
+
+void MoveBall(SDL_Rect* rect, Speed& speed)
+{
+    if (ball.x == player1.x + player1.w)
+    {
+        if((ball.y <= player1.y + player1.h)&&(ball.y+ball.h >= player1.y ))
+        speed.x = -speed.x;
+    }
+    if (ball.x + ball.w == player2.x)
+    {
+        if ((ball.y <= player2.y + player2.h) && (ball.y + ball.h >= player2.y))
+        speed.x = -speed.x;
+    }
+
+    ball.x += speed.x;
+    ball.y += speed.y;
 }
 
 int main(int argc, char* argv[])
@@ -55,24 +90,17 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
-    SDL_SetRenderDrawColor(renderer, 225,255,255,255);
-    SDL_Rect player1 = { 20,(WINDOW_SCREEN_HEIGHT - 200) / 2,40,200 };
-    SDL_RenderFillRect(renderer, &player1);
 
-    SDL_Rect player2 = { WINDOW_SCREEN_WIDTH - 60,(WINDOW_SCREEN_HEIGHT - 200) / 2,40,200 };
-    SDL_RenderFillRect(renderer, &player2);
-
-    SDL_Rect ball = { (WINDOW_SCREEN_WIDTH-20)/2,(WINDOW_SCREEN_HEIGHT-20)/2,20,20 };
-    SDL_RenderFillRect(renderer, &ball);
+    UpdateScreen();
 
     SDL_Rect Border = { WINDOW_SCREEN_WIDTH/2 ,0,1,WINDOW_SCREEN_HEIGHT };
     SDL_RenderFillRect(renderer, &Border);
-    SDL_RenderPresent(renderer);
 
-    int movementSpeed = 10;
+    
+
     SDL_Event event;
     int running = 1;
-    int movingPlayer1 = 0, movingPlayer2 = 0;
+    int movingPlayer1 = 0, movingPlayer2 = 0;//act like bool and direction for player //0 player is not moving //1 moving down //-1 moving up
     while (running)
     {
         if (SDL_PollEvent(&event))
@@ -83,22 +111,29 @@ int main(int argc, char* argv[])
             }
         }
 
+        //ball movement
+        MoveBall(&ball, ballSpeed);
+                       
+        //handle players movement:
         // Get current keyboard state
         const Uint8* keystate = SDL_GetKeyboardState(NULL);
 
-        // Handle Player 1 Movement
+        // Player 1 Movement
         int movingPlayer1 = 0;
         if (keystate[SDL_SCANCODE_W] && player1.y > 0) movingPlayer1 = -1;
         if (keystate[SDL_SCANCODE_S] && player1.y < WINDOW_SCREEN_HEIGHT - player1.h) movingPlayer1 = 1;
 
-        // Handle Player 2 Movement
+        // Player 2 Movement
         int movingPlayer2 = 0;
         if (keystate[SDL_SCANCODE_UP] && player2.y > 0) movingPlayer2 = -1;
         if (keystate[SDL_SCANCODE_DOWN] && player2.y < WINDOW_SCREEN_HEIGHT - player2.h) movingPlayer2 = 1;
 
+        //move players
         if (movingPlayer1) MovePlayer(&player1, movingPlayer1 * movementSpeed);
         if (movingPlayer2) MovePlayer(&player2, movingPlayer2 * movementSpeed);
-        UpdateScreen(player1, player2);
+        UpdateScreen();
+
+        //+-60fps
         SDL_Delay(16);
     }
 
