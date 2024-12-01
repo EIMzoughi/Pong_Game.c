@@ -4,9 +4,10 @@
 const int WINDOW_SCREEN_WIDTH = 640;
 const int WINDOW_SCREEN_HEIGHT = 480;
 
-int movementSpeed = 10;//player speed
-int playerWidth = 40;
-int playerHight = 200;
+static int movementSpeed = 10;//player speed
+static int initBallSpeed = 10;
+static int playerWidth = 40;
+static int playerHight = 200;
 
 
 SDL_Window* window = NULL;
@@ -22,7 +23,7 @@ typedef struct speed
     int y;
 }Speed;
 
-Speed ballSpeed = { 10,0 };//init ball speed
+Speed ballSpeed = { initBallSpeed,0 };//init ball speed
 
 int Initisialize()
 {
@@ -71,13 +72,31 @@ void MoveBall(SDL_Rect* rect, Speed& speed)
 {
     if (ball.x == player1.x + player1.w)
     {
-        if((ball.y <= player1.y + player1.h)&&(ball.y+ball.h >= player1.y ))
-        speed.x = -speed.x;
+        if ((ball.y <= player1.y + player1.h) && (ball.y + ball.h >= player1.y))
+        {
+            speed.x = -speed.x;
+            double hitfraction = double((ball.y + ball.h) / 2 - (player1.y + playerHight) / 2) / (playerHight);
+            //speed.x = fabs(1-hitfraction) * speed.x;
+            speed.y = hitfraction > 0 ? hitfraction * (double)initBallSpeed : -hitfraction * (double)initBallSpeed;
+            printf("%f",(float)speed.y);
+        }
+
     }
     if (ball.x + ball.w == player2.x)
     {
         if ((ball.y <= player2.y + player2.h) && (ball.y + ball.h >= player2.y))
-        speed.x = -speed.x;
+        {
+            speed.x = -speed.x;
+            double hitfraction = double((((ball.y + ball.h) / 2 - (player2.y + playerHight) /2)) / (playerHight));
+            //speed.x = fabs(1-hitfraction) * speed.x;
+            speed.y = hitfraction > 0 ? hitfraction * (double)initBallSpeed : -hitfraction * (double)initBallSpeed;
+            printf("%f", (float)speed.y);
+        }
+    }
+
+    if (ball.y <= 0 || ball.y >= WINDOW_SCREEN_HEIGHT - 20)
+    {
+        speed.y = -speed.y;
     }
 
     ball.x += speed.x;
