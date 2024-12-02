@@ -6,11 +6,13 @@
 
 const int WINDOW_SCREEN_WIDTH = 640;
 const int WINDOW_SCREEN_HEIGHT = 480;
+const char* FONT_NAME = "ARCADE_I.ttf";
 
 static int movementSpeed = 10;//player speed
-static int initBallSpeed = 5;
+static int initBallSpeed = 8;//ball speed
 static int playerWidth = 20;
 static int playerHight = 100;
+
 
 
 SDL_Window* window = NULL;
@@ -61,7 +63,7 @@ int Initisialize()
         printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
         return 0;
     }
-    font = TTF_OpenFont("Debrosee-ALPnL.ttf", 50);
+    font = TTF_OpenFont(FONT_NAME , 24);
     if (font == NULL)
     {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -111,8 +113,10 @@ void UpdateScreen()
     SDL_RenderFillRect(renderer, &player1);
     SDL_RenderFillRect(renderer, &player2);
     SDL_RenderFillRect(renderer, &ball);
+    
 
-    RenderText(std::to_string(score.player1), 100, 100);
+    RenderText(std::to_string(score.player1), 200, 20); 
+    RenderText(std::to_string(score.player2), 400, 20); 
 
     SDL_RenderPresent(renderer);
 }
@@ -132,8 +136,6 @@ void ResetGame()
 
 void MoveBall(SDL_Rect* ball, Speed& speed)
 {
-   
-
     // wall collision 
     if (ball->y <= 0 || ball->y + ball->h >= WINDOW_SCREEN_HEIGHT)
     {
