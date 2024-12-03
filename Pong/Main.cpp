@@ -238,36 +238,6 @@ void HandleInput()
     if (movingPlayer1) MovePlayer(&player1, movingPlayer1 * movementSpeed);
     if (movingPlayer2) MovePlayer(&player2, movingPlayer2 * movementSpeed);
 }
-void ResizeWindow(int width,int height)
-{
-    int newWidth = width;
-    int newHeight = height;
-
-    float widthRatio = (float)newWidth / WINDOW_SCREEN_WIDTH;
-    float heightRatio = (float)newHeight / WINDOW_SCREEN_HEIGHT;
-
-    // Update positions based on new size
-    player1.x = playersPaddingFromScreen * widthRatio;
-    player1.y = (player1.y * heightRatio);
-    player1.w = playerWidth * widthRatio;
-    player1.h = playerHight * heightRatio;
-
-    player2.x = newWidth - playerWidth * widthRatio - playersPaddingFromScreen * widthRatio;
-    player2.y = (player2.y * heightRatio);
-    player2.w = playerWidth * widthRatio;
-    player2.h = playerHight * heightRatio;
-
-    ball.x = (newWidth - 20) / 2;
-    ball.y = (newHeight - 20) / 2;
-    ball.w *= widthRatio;
-    ball.h *= heightRatio;
-
-    // Update the old window size values
-    WINDOW_SCREEN_WIDTH = newWidth;
-    WINDOW_SCREEN_HEIGHT = newHeight;
-
-    printf("Window resized to %dx%d\n", newWidth, newHeight);
-}
 
 int main(int argc, char* argv[])
 {
@@ -291,11 +261,6 @@ int main(int argc, char* argv[])
             switch (event.type)
             {
             case SDL_QUIT: running = 0; break;
-            case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-                {
-                    ResizeWindow(event.window.data1, event.window.data2);
-                }
             }
         }
 
@@ -315,3 +280,50 @@ int main(int argc, char* argv[])
     SDL_Quit();
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/*void ResizeWindow(int width, int height)
+{
+    int newWidth = width;
+    int newHeight = height;
+
+    float widthRatio = (float)newWidth / WINDOW_SCREEN_WIDTH;
+    float heightRatio = (float)newHeight / WINDOW_SCREEN_HEIGHT;
+
+    // Update positions based on new size
+    player1.x = playersPaddingFromScreen * widthRatio;
+    player1.y = (player1.y * heightRatio);
+    player1.w = player1.w * widthRatio;
+    player1.h = player1.h * heightRatio;
+
+    player2.x = newWidth - playerWidth * widthRatio - playersPaddingFromScreen * widthRatio;
+    player2.y = (player2.y * heightRatio);
+    player2.w = player2.w * widthRatio;
+    player2.h = player2.h * heightRatio;
+
+    ball.x = (newWidth - ball.x * widthRatio) ;
+    ball.y = (newHeight - ball.y * heightRatio) ;
+    ball.w *= widthRatio;
+    ball.h *= heightRatio;
+
+    ballSpeed.x *= widthRatio;
+    ballSpeed.y *= heightRatio;
+
+    // Update the old window size values
+    WINDOW_SCREEN_WIDTH = newWidth;
+    WINDOW_SCREEN_HEIGHT = newHeight;
+
+    printf("Window resized to %dx%d\n", newWidth, newHeight);
+}*/
