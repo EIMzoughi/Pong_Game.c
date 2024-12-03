@@ -4,14 +4,15 @@
 #include <algorithm>
 #include <string>
 
-const int WINDOW_SCREEN_WIDTH = 640;
-const int WINDOW_SCREEN_HEIGHT = 480;
+ int WINDOW_SCREEN_WIDTH = 840;
+ int WINDOW_SCREEN_HEIGHT = 680;
 const char* FONT_NAME = "ARCADE_I.ttf";
 
 static int movementSpeed = 10;//player speed
-static int initBallSpeed = 8;//ball speed
+static int initBallSpeed = 10;//ball speed
 static int playerWidth = 20;
 static int playerHight = 100;
+static int playersPaddingFromScreen = 20;
 
 
 
@@ -19,8 +20,8 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 TTF_Font* font = NULL;
 
-SDL_Rect player1 = { 20, (WINDOW_SCREEN_HEIGHT - playerHight) / 2, playerWidth, playerHight };
-SDL_Rect player2 = { WINDOW_SCREEN_WIDTH - 60, (WINDOW_SCREEN_HEIGHT - playerHight) / 2, playerWidth, playerHight };
+SDL_Rect player1 = { playersPaddingFromScreen, (WINDOW_SCREEN_HEIGHT - playerHight) / 2, playerWidth, playerHight };
+SDL_Rect player2 = { WINDOW_SCREEN_WIDTH - playerWidth - playersPaddingFromScreen , (WINDOW_SCREEN_HEIGHT - playerHight) / 2, playerWidth, playerHight };
 SDL_Rect ball = { (WINDOW_SCREEN_WIDTH - 20) / 2,(WINDOW_SCREEN_HEIGHT - 20) / 2,20,20 };
 
 typedef struct speed
@@ -63,7 +64,7 @@ int Initisialize()
         printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
         return 0;
     }
-    font = TTF_OpenFont(FONT_NAME , 24);
+    font = TTF_OpenFont(FONT_NAME , 42);
     if (font == NULL)
     {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -237,6 +238,36 @@ void HandleInput()
     if (movingPlayer1) MovePlayer(&player1, movingPlayer1 * movementSpeed);
     if (movingPlayer2) MovePlayer(&player2, movingPlayer2 * movementSpeed);
 }
+void ResizeWindow(int width,int height)
+{
+    int newWidth = width;
+    int newHeight = height;
+
+    float widthRatio = (float)newWidth / WINDOW_SCREEN_WIDTH;
+    float heightRatio = (float)newHeight / WINDOW_SCREEN_HEIGHT;
+
+    // Update positions based on new size
+    player1.x = playersPaddingFromScreen * widthRatio;
+    player1.y = (player1.y * heightRatio);
+    player1.w = playerWidth * widthRatio;
+    player1.h = playerHight * heightRatio;
+
+    player2.x = newWidth - playerWidth * widthRatio - playersPaddingFromScreen * widthRatio;
+    player2.y = (player2.y * heightRatio);
+    player2.w = playerWidth * widthRatio;
+    player2.h = playerHight * heightRatio;
+
+    ball.x = (newWidth - 20) / 2;
+    ball.y = (newHeight - 20) / 2;
+    ball.w *= widthRatio;
+    ball.h *= heightRatio;
+
+    // Update the old window size values
+    WINDOW_SCREEN_WIDTH = newWidth;
+    WINDOW_SCREEN_HEIGHT = newHeight;
+
+    printf("Window resized to %dx%d\n", newWidth, newHeight);
+}
 
 int main(int argc, char* argv[])
 {
@@ -260,6 +291,11 @@ int main(int argc, char* argv[])
             switch (event.type)
             {
             case SDL_QUIT: running = 0; break;
+            case SDL_WINDOWEVENT:
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+                {
+                    ResizeWindow(event.window.data1, event.window.data2);
+                }
             }
         }
 
