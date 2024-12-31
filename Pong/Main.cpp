@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-    if (!Initisialize())
+    if (!InitisializeSDL())
     {
         return -1;
     }

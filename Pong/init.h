@@ -5,6 +5,6 @@
 
 #include "config.h"
 
-int Initisialize();
+int InitisializeSDL();
 
 #endif // INIT_H

@@ -19,6 +19,7 @@ const int initBallSpeed = 10;     // ball speed
 const int playerWidth = 20;
 const int playerHeight = 100;
 const int playersPaddingFromScreen = 20;
+const int ballWidth = 20;
 
 // Global variables
 extern SDL_Window* window;

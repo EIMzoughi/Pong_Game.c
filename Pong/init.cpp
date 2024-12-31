@@ -1,7 +1,7 @@
 #include "init.h"
 #include <stdio.h>
 
-int Initisialize()
+int InitisializeSDL()
 {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
