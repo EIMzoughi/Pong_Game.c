@@ -55,7 +55,12 @@ bool startServer(int port) {
     return true;
 }
 
-bool connectToServer(const char* ip, int port) {
+bool connectToServer(int port) {
+    char serverIp[16];
+
+    std::cout << "Enter server ip adress: ";
+    scanf_s("%15s", serverIp, (unsigned)_countof(serverIp));
+
     sockaddr_in serverAddr;
 
     clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -65,7 +70,7 @@ bool connectToServer(const char* ip, int port) {
     }
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr(ip);
+    serverAddr.sin_addr.s_addr = inet_addr(serverIp);
     serverAddr.sin_port = htons(port);
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
@@ -74,7 +79,7 @@ bool connectToServer(const char* ip, int port) {
         return false;
     }
 
-    std::cout << "Connected to server at " << ip << ":" << port << std::endl;
+    std::cout << "Connected to server at " << serverIp << ":" << port << std::endl;
     return true;
 }
 
@@ -93,48 +98,4 @@ void cleanupWinsock() {
     if (connectionSocket != INVALID_SOCKET) closesocket(connectionSocket);
     if (clientSocket != INVALID_SOCKET) closesocket(clientSocket);
     WSACleanup();
-}
-
-void sendDataSafe(const char* data, int size) {
-    SOCKET targetSocket = (serverSocket != INVALID_SOCKET) ? connectionSocket : clientSocket;
-    if (targetSocket == INVALID_SOCKET) {
-        std::cerr << "Socket invalid. Cannot send data." << std::endl;
-        return;
-    }
-
-    int result = send(targetSocket, data, size, 0);
-    if (result == SOCKET_ERROR) {
-        std::cerr << "Send failed: " << WSAGetLastError() << std::endl;
-        // Handle send error (e.g., reconnect, terminate loop)
-    }
-}
-
-void receiveDataSafe(char* buffer, int size) {
-    SOCKET targetSocket = (serverSocket != INVALID_SOCKET) ? connectionSocket : clientSocket;
-    if (targetSocket == INVALID_SOCKET) {
-        std::cerr << "Socket invalid. Cannot receive data." << std::endl;
-        return;
-    }
-
-    fd_set readSet;
-    FD_ZERO(&readSet);
-    FD_SET(targetSocket, &readSet);
-
-    timeval timeout;
-    timeout.tv_sec = 5; // 5 seconds
-    timeout.tv_usec = 0;
-
-    int result = select(targetSocket + 1, &readSet, NULL, NULL, &timeout);
-    if (result > 0) {
-        int bytesReceived = recv(targetSocket, buffer, size, 0);
-        if (bytesReceived <= 0) {
-            std::cerr << "Connection closed or error: " << WSAGetLastError() << std::endl;
-        }
-    }
-    else if (result == 0) {
-        std::cerr << "Receive timeout." << std::endl;
-    }
-    else {
-        std::cerr << "Select error: " << WSAGetLastError() << std::endl;
-    }
 }
