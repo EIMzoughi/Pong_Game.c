@@ -9,7 +9,7 @@ int InitisializeSDL()
         printf("SDL could not initialize! SDLError: %s\n", SDL_GetError());
         return 0;
     }
-    window = SDL_CreateWindow("Pong Game ElMzoughi", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_SCREEN_WIDTH, WINDOW_SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("Pong Game ElMzoughi", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_SCREEN_WIDTH, WINDOW_SCREEN_HEIGHT, 0);
     if (!window)
     {
         printf("window could not be created%s", SDL_GetError());
