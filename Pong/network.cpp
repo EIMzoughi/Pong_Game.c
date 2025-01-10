@@ -1,5 +1,5 @@
 #include "network.h"
-#include <iostream>
+//#include <iostream>
 
 SOCKET serverSocket = INVALID_SOCKET; // Server socket
 SOCKET clientSocket = INVALID_SOCKET; // Client socket
@@ -9,7 +9,7 @@ bool initializeWinsock() {
     WSADATA wsaData;
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != 0) {
-        std::cerr << "WSAStartup failed: " << result << std::endl;
+        printf("WSAStartup failed: %i\n", result);
         return false;
     }
     return true;
@@ -20,7 +20,7 @@ bool startServer(int port) {
 
     serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (serverSocket == INVALID_SOCKET) {
-        std::cerr << "Failed to create socket: " << WSAGetLastError() << std::endl;
+        printf("Failed to create socket: %i\n", WSAGetLastError());
         return false;
     }
 
@@ -29,43 +29,43 @@ bool startServer(int port) {
     serverAddr.sin_port = htons(port);
 
     if (bind(serverSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-        std::cerr << "Bind failed: " << WSAGetLastError() << std::endl;
+        printf("Bind failed: %i\n", WSAGetLastError());
         closesocket(serverSocket);
         return false;
     }
 
     if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
-        std::cerr << "Listen failed: " << WSAGetLastError() << std::endl;
+        printf("Listen failed: %i \n",WSAGetLastError());
         closesocket(serverSocket);
         return false;
     }
 
-    std::cout << "Server is listening on port " << port << "..." << std::endl;
+    printf("Server is listening on port %i ...\n", port);
 
     sockaddr_in clientAddr;
     int clientAddrSize = sizeof(clientAddr);
     connectionSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientAddrSize);
     if (connectionSocket == INVALID_SOCKET) {
-        std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
+        printf("Accept failed: %i" , WSAGetLastError() );
         closesocket(serverSocket);
         return false;
     }
 
-    std::cout << "Client connected!\n";
+    printf("Client connected!\n");
     return true;
 }
 
 bool connectToServer(int port) {
     char serverIp[16];
 
-    std::cout << "Enter server ip adress: ";
+    printf( "Enter server ip adress: ");
     scanf_s("%15s", serverIp, (unsigned)_countof(serverIp));
 
     sockaddr_in serverAddr;
 
     clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (clientSocket == INVALID_SOCKET) {
-        std::cerr << "Failed to create socket: " << WSAGetLastError() << std::endl;
+        printf( "Failed to create socket: %i\n" ,WSAGetLastError());
         return false;
     }
 
@@ -74,12 +74,12 @@ bool connectToServer(int port) {
     serverAddr.sin_port = htons(port);
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-        std::cerr << "Connect failed: " << WSAGetLastError() << std::endl;
+        printf("Connect failed: %i\n ", WSAGetLastError());
         closesocket(clientSocket);
         return false;
     }
 
-    std::cout << "Connected to server at " << serverIp << ":" << port << std::endl;
+    printf("Connected to server at %s : %i\n",serverIp, port);
     return true;
 }
 
