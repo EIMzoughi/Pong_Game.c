@@ -3,7 +3,6 @@
 #include "input.h"
 #include "rendering.h"
 #include "network.h"
-#include "iostream"
 #include "config.h"
 #include "mutex"
 #include "thread"
