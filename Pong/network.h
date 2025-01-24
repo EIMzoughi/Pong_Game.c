@@ -9,6 +9,14 @@
 
 #pragma warning(disable:4996) 
 
+// Game State Structure
+typedef struct GameState {
+    int ballX, ballY;
+    int ballSpeedX, ballSpeedY;
+    int paddle1Y, paddle2Y;
+    int score1, score2;
+} GameState;
+
 // Function declarations
 bool initializeWinsock();                // Initialize Winsock
 bool startServer(int port);              // Start as server

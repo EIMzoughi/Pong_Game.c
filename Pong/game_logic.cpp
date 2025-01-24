@@ -1,6 +1,6 @@
 #include "game_logic.h"
-#include <cmath>
-#include <algorithm>
+
+
 
 void ResetGame() {
     ball.x = (WINDOW_SCREEN_WIDTH - ball.w) / 2;
@@ -15,7 +15,7 @@ void MoveBall(SDL_Rect* ball, Speed& speed)
     if (ball->y <= 0 || ball->y + ball->h >= WINDOW_SCREEN_HEIGHT)
     {
         ballSpeed.y = -ballSpeed.y; // Reverse vertical direction
-        ball->y = std::max(0, std::min(ball->y, WINDOW_SCREEN_HEIGHT - ball->h)); // Clamp position
+        ball->y = MAX(0, MIN(ball->y, WINDOW_SCREEN_HEIGHT - ball->h)); // Clamp position
     }
 
     // Paddle 1 collision (left side)
