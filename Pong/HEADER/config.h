@@ -10,9 +10,6 @@
 const int WINDOW_SCREEN_WIDTH = 840;
 const int WINDOW_SCREEN_HEIGHT = 680;
 
-// font settings
-const char* const FONT_NAME = "ARCADE_I.ttf";
-
 // gameplay settings
 const int movementSpeed = 10;     // player speed
 const int initBallSpeed = 10;     // ball speed

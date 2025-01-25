@@ -1,5 +1,5 @@
-#include "init.h"
-#include <stdio.h>
+#include "..\HEADER\init.h"
+
 
 int InitisializeSDL()
 {

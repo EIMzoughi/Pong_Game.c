@@ -137,25 +137,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="game_loops.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="config.cpp" />
-    <ClCompile Include="game_logic.cpp" />
-    <ClCompile Include="init.cpp" />
-    <ClCompile Include="input.cpp" />
-    <ClCompile Include="network.cpp" />
-    <ClCompile Include="rendering.cpp" />
+    <ClCompile Include="SRC\game.cpp" />
+    <ClCompile Include="SRC\game_loops.cpp" />
+    <ClCompile Include="SRC\Main.cpp" />
+    <ClCompile Include="SRC\config.cpp" />
+    <ClCompile Include="SRC\game_logic.cpp" />
+    <ClCompile Include="SRC\init.cpp" />
+    <ClCompile Include="SRC\input.cpp" />
+    <ClCompile Include="SRC\network.cpp" />
+    <ClCompile Include="SRC\rendering.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="game_loops.h" />
-    <ClInclude Include="game_logic.h" />
-    <ClInclude Include="init.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="network.h" />
-    <ClInclude Include="rendering.h" />
+    <ClInclude Include="HEADER\config.h" />
+    <ClInclude Include="HEADER\game.h" />
+    <ClInclude Include="HEADER\game_loops.h" />
+    <ClInclude Include="HEADER\game_logic.h" />
+    <ClInclude Include="HEADER\init.h" />
+    <ClInclude Include="HEADER\input.h" />
+    <ClInclude Include="HEADER\network.h" />
+    <ClInclude Include="HEADER\rendering.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="FONT\ARCADE_I.TTF" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

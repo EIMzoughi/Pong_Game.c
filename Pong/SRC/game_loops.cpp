@@ -1,4 +1,4 @@
-#include "game_loops.h"
+#include "..\HEADER\game_loops.h"
 
 void serverGameLoop() {
     GameState state = { ball.x, ball.y, ballSpeed.x, ballSpeed.y, player1.y, player2.y, score.player1, score.player2 };

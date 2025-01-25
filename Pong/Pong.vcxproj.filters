@@ -15,58 +15,61 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="SRC\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="config.cpp">
+    <ClCompile Include="SRC\config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_logic.cpp">
+    <ClCompile Include="SRC\game_logic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="init.cpp">
+    <ClCompile Include="SRC\init.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="input.cpp">
+    <ClCompile Include="SRC\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rendering.cpp">
+    <ClCompile Include="SRC\rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network.cpp">
+    <ClCompile Include="SRC\network.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_loops.cpp">
+    <ClCompile Include="SRC\game_loops.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
+    <ClCompile Include="SRC\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h">
+    <ClInclude Include="HEADER\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="init.h">
+    <ClInclude Include="HEADER\init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rendering.h">
+    <ClInclude Include="HEADER\rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="input.h">
+    <ClInclude Include="HEADER\input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_logic.h">
+    <ClInclude Include="HEADER\game_logic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="network.h">
+    <ClInclude Include="HEADER\network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_loops.h">
+    <ClInclude Include="HEADER\game_loops.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game.h">
+    <ClInclude Include="HEADER\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="FONT\ARCADE_I.TTF" />
   </ItemGroup>
 </Project>

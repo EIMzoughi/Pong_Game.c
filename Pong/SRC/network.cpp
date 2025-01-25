@@ -1,4 +1,4 @@
-#include "network.h"
+#include "..\HEADER\network.h"
 
 SOCKET serverSocket = INVALID_SOCKET; // Server socket
 SOCKET clientSocket = INVALID_SOCKET; // Client socket
