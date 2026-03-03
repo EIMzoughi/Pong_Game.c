@@ -1,4 +1,8 @@
 #include "..\HEADER\game_loops.h"
+#include <atomic>
+
+// Shared stop flag for network threads
+static std::atomic<bool> g_running(true);
 
 void serverGameLoop() {
     GameState state = { ball.x, ball.y, ballSpeed.x, ballSpeed.y, player1.y, player2.y, score.player1, score.player2 };
@@ -6,7 +10,7 @@ void serverGameLoop() {
     uint32_t frameStart;
     int frameTime;
 
-    while (true) {
+    while (g_running.load()) {
         frameStart = SDL_GetTicks();
 
         //handle players movement:
@@ -21,7 +25,6 @@ void serverGameLoop() {
         player1.y += movingPlayer1 * movementSpeed;
 
         // Update ball and check collisions
-        //mtx.lock();
         MoveBall(&ball, ballSpeed);
         state.ballX = ball.x;
         state.ballY = ball.y;
@@ -30,12 +33,20 @@ void serverGameLoop() {
         state.paddle1Y = player1.y;
         state.score1 = score.player1;
         state.score2 = score.player2;
-        //mtx.unlock();
+
         // Send state to client
-        sendData((char*)&state, sizeof(GameState));
+        int bytesSent = send(connectionSocket, (char*)&state, sizeof(GameState), 0);
+        if (bytesSent == SOCKET_ERROR) {
+            printf("Failed to send game state: %d\n", WSAGetLastError());
+            break;
+        }
 
         // Receive paddle2 position from client
-        receiveData((char*)&state.paddle2Y, sizeof(int));
+        int bytesRecv = recv(connectionSocket, (char*)&state.paddle2Y, sizeof(int), 0);
+        if (bytesRecv == SOCKET_ERROR || bytesRecv == 0) {
+            printf("Failed to receive paddle position: %d\n", WSAGetLastError());
+            break;
+        }
         player2.y = state.paddle2Y;
 
         UpdateScreen();
@@ -54,10 +65,9 @@ void clientGameLoop() {
     GameState state;
 
     uint32_t frameStart;
-    int frametime;
+    int frameTime;
 
-
-    while (true) {
+    while (g_running.load()) {
 
         frameStart = SDL_GetTicks();
 
@@ -71,13 +81,20 @@ void clientGameLoop() {
         if (keystate[SDL_SCANCODE_DOWN] && player2.y < WINDOW_SCREEN_HEIGHT - player2.h) movingPlayer2 = 1;
         player2.y += movingPlayer2 * movementSpeed;
 
-
-        sendData((char*)&player2.y, sizeof(int));
+        // Send paddle position to server
+        int bytesSent = send(clientSocket, (char*)&player2.y, sizeof(int), 0);
+        if (bytesSent == SOCKET_ERROR) {
+            printf("Failed to send paddle position: %d\n", WSAGetLastError());
+            break;
+        }
 
         // Receive game state from server
-        receiveData((char*)&state, sizeof(GameState));
+        int bytesRecv = recv(clientSocket, (char*)&state, sizeof(GameState), 0);
+        if (bytesRecv == SOCKET_ERROR || bytesRecv == 0) {
+            printf("Failed to receive game state: %d\n", WSAGetLastError());
+            break;
+        }
 
-        //m.lock();
         // Update local state
         ball.x = state.ballX;
         ball.y = state.ballY;
@@ -86,16 +103,15 @@ void clientGameLoop() {
         player1.y = state.paddle1Y;
         score.player1 = state.score1;
         score.player2 = state.score2;
-        //m.unlock();
+
         UpdateScreen();
 
-        frametime = SDL_GetTicks() - frameStart;
+        frameTime = SDL_GetTicks() - frameStart;
 
         // If the frame was too quick, delay to maintain fixed FPS
-        if (frametime < frameDelay) {
-            SDL_Delay(frameDelay - frametime);
+        if (frameTime < frameDelay) {
+            SDL_Delay(frameDelay - frameTime);
         }
-
     }
 }
 
@@ -106,8 +122,12 @@ void localGameLoop()
     SDL_Event event;
     int running = 1;
 
+    uint32_t frameStart;
+    int frameTime;
 
     while (running) {
+        frameStart = SDL_GetTicks();
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = 0;
@@ -118,8 +138,11 @@ void localGameLoop()
         MoveBall(&ball, ballSpeed);
         UpdateScreen();
 
-        //+-60fps
-        SDL_Delay(16);
+        // Frame rate limiting
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameTime < frameDelay) {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 }
 
@@ -129,13 +152,12 @@ void HandleOnlineLogic()
     int mode;
     bool isServer = false;
 
-
     printf("Select mode: [1] Server, [2] Client: ");
 
     do
     {
         scanf_s("%d", &mode);
-    } while (mode < 0 && mode >1);
+    } while (mode < 1 || mode > 2);
 
     if (!initializeWinsock()) {
         return;
@@ -153,7 +175,6 @@ void HandleOnlineLogic()
     }
     else
     {
-
         if (!connectToServer(12345))
         {
             printf("failed to connect to server");
@@ -167,15 +188,16 @@ void HandleOnlineLogic()
         return;
     }
 
+    // Reset the stop flag
+    g_running.store(true);
+
+    std::thread gameThread;
     if (isServer) {
-        std::thread t1(serverGameLoop);
-        t1.detach();
+        gameThread = std::thread(serverGameLoop);
     }
     else {
-        std::thread t2(clientGameLoop);
-        t2.detach();
+        gameThread = std::thread(clientGameLoop);
     }
-
 
     SDL_Event event;
     bool running = true;
@@ -186,4 +208,12 @@ void HandleOnlineLogic()
             }
         }
     }
+
+    // Signal the game thread to stop and wait for it
+    g_running.store(false);
+    if (gameThread.joinable()) {
+        gameThread.join();
+    }
+
+    cleanupWinsock();
 }

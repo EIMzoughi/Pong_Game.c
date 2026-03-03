@@ -1,4 +1,5 @@
 #include "..\HEADER\network.h"
+#include <ws2tcpip.h>
 
 SOCKET serverSocket = INVALID_SOCKET; // Server socket
 SOCKET clientSocket = INVALID_SOCKET; // Client socket
@@ -57,7 +58,7 @@ bool startServer(int port) {
 bool connectToServer(int port) {
     char serverIp[16];
 
-    printf( "Enter server ip adress: ");
+    printf( "Enter server ip address: ");
     scanf_s("%15s", serverIp, (unsigned)_countof(serverIp));
 
     sockaddr_in serverAddr;
@@ -69,7 +70,13 @@ bool connectToServer(int port) {
     }
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr(serverIp);
+    // Use inet_pton instead of deprecated inet_addr
+    if (inet_pton(AF_INET, serverIp, &serverAddr.sin_addr) != 1) {
+        printf("Invalid IP address format: %s\n", serverIp);
+        closesocket(clientSocket);
+        clientSocket = INVALID_SOCKET;
+        return false;
+    }
     serverAddr.sin_port = htons(port);
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
@@ -84,12 +91,24 @@ bool connectToServer(int port) {
 
 void sendData(const char* data, int size) {
     SOCKET targetSocket = (serverSocket != INVALID_SOCKET) ? connectionSocket : clientSocket;
-    send(targetSocket, data, size, 0);
+    int bytesSent = send(targetSocket, data, size, 0);
+    if (bytesSent == SOCKET_ERROR) {
+        printf("send failed: %d\n", WSAGetLastError());
+    } else if (bytesSent != size) {
+        printf("send incomplete: %d/%d bytes\n", bytesSent, size);
+    }
 }
 
 void receiveData(char* buffer, int size) {
     SOCKET targetSocket = (serverSocket != INVALID_SOCKET) ? connectionSocket : clientSocket;
-    recv(targetSocket, buffer, size, 0);
+    int bytesReceived = recv(targetSocket, buffer, size, 0);
+    if (bytesReceived == SOCKET_ERROR) {
+        printf("recv failed: %d\n", WSAGetLastError());
+    } else if (bytesReceived == 0) {
+        printf("Connection closed by peer\n");
+    } else if (bytesReceived != size) {
+        printf("recv incomplete: %d/%d bytes\n", bytesReceived, size);
+    }
 }
 
 void cleanupWinsock() {

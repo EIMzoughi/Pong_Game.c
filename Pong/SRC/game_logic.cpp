@@ -11,11 +11,35 @@ void ResetGame() {
 
 void MoveBall(SDL_Rect* ball, Speed& speed)
 {
+    // Update ball position first
+    ball->x += speed.x;
+    ball->y += speed.y;
+
     // wall collision 
     if (ball->y <= 0 || ball->y + ball->h >= WINDOW_SCREEN_HEIGHT)
     {
-        ballSpeed.y = -ballSpeed.y; // Reverse vertical direction
+        speed.y = -speed.y; // Reverse vertical direction
         ball->y = MAX(0, MIN(ball->y, WINDOW_SCREEN_HEIGHT - ball->h)); // Clamp position
+    }
+
+    // Ball passed left edge — Player 2 scores
+    if (ball->x + ball->w < 0)
+    {
+        score.player2++;
+        ResetGame();
+        speed.x = initBallSpeed;
+        speed.y = 0;
+        return;
+    }
+
+    // Ball passed right edge — Player 1 scores
+    if (ball->x > WINDOW_SCREEN_WIDTH)
+    {
+        score.player1++;
+        ResetGame();
+        speed.x = -initBallSpeed;
+        speed.y = 0;
+        return;
     }
 
     // Paddle 1 collision (left side)
@@ -24,9 +48,9 @@ void MoveBall(SDL_Rect* ball, Speed& speed)
         if (ball->y + ball->h >= player1.y && ball->y <= player1.y + player1.h)
         {
             // Reverse x direction
-            ballSpeed.x = -ballSpeed.x;
+            speed.x = -speed.x;
 
-            // reflecton angle
+            // reflection angle
             double hitPoint = (ball->y + ball->h / 2.0) - (player1.y + player1.h / 2.0);
             double normalizedHitPoint = hitPoint / (player1.h / 2.0);
 
@@ -35,21 +59,12 @@ void MoveBall(SDL_Rect* ball, Speed& speed)
 
             // Calculate new speed components
             double bounceAngle = normalizedHitPoint * maxAngle;
-            double ballSpeedMagnitude = sqrt(ballSpeed.x * ballSpeed.x + ballSpeed.y * ballSpeed.y);
+            double ballSpeedMagnitude = sqrt(speed.x * speed.x + speed.y * speed.y);
 
-
-            ballSpeed.y = sin(bounceAngle) * ballSpeedMagnitude;
+            speed.y = static_cast<int>(sin(bounceAngle) * ballSpeedMagnitude);
 
             // Ensure ball doesn't get stuck in the paddle
             ball->x = player1.x + player1.w + 1;
-        }
-        else
-        {
-            //reset game and add score
-            score.player2++;
-            ResetGame();
-            ballSpeed.x = -initBallSpeed;
-            ballSpeed.y = 0; // Reset vertical speed
         }
     }
 
@@ -59,9 +74,9 @@ void MoveBall(SDL_Rect* ball, Speed& speed)
         if (ball->y + ball->h >= player2.y && ball->y <= player2.y + player2.h)
         {
             // Reverse horizontal direction
-            ballSpeed.x = -ballSpeed.x;
+            speed.x = -speed.x;
 
-            // reflecton angle
+            // reflection angle
             double hitPoint = (ball->y + ball->h / 2.0) - (player2.y + player2.h / 2.0);
             double normalizedHitPoint = hitPoint / (player2.h / 2.0);
 
@@ -70,25 +85,12 @@ void MoveBall(SDL_Rect* ball, Speed& speed)
 
             // Calculate new speed components
             double bounceAngle = normalizedHitPoint * maxAngle;
-            double ballSpeedMagnitude = sqrt(ballSpeed.x * ballSpeed.x + ballSpeed.y * ballSpeed.y);
+            double ballSpeedMagnitude = sqrt(speed.x * speed.x + speed.y * speed.y);
 
-
-            ballSpeed.y = sin(bounceAngle) * ballSpeedMagnitude;
+            speed.y = static_cast<int>(sin(bounceAngle) * ballSpeedMagnitude);
 
             // Ensure ball doesn't get stuck in the paddle
             ball->x = player2.x - ball->w - 1;
         }
-        else
-        {
-            // reset game and add score
-            score.player1++;
-            ResetGame();
-            ballSpeed.x = initBallSpeed;
-            ballSpeed.y = 0; // Reset vertical speed
-        }
     }
-
-    // Update ball position
-    ball->x += ballSpeed.x;
-    ball->y += ballSpeed.y;
 }
